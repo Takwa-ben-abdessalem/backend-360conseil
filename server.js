@@ -8,7 +8,7 @@ const mongoose = require("mongoose");
 
 // Connexion à MongoDB (remplacez l'URL par la vôtre, ex: 'mongodb://localhost:27017/ma_base_de_donnees')
 mongoose
-  .connect("mongodb://localhost:27017/360conseil_db")
+  .connect(process.env.MONGODB_URI || "mongodb://localhost:27017/360conseil_db")
   .then(() => console.log("Connecté à MongoDB"))
   .catch((err) => console.error("Erreur de connexion à MongoDB:", err));
 
