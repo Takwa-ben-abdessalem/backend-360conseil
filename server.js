@@ -8,9 +8,12 @@ const mongoose = require("mongoose");
 
 // Connexion à MongoDB (remplacez l'URL par la vôtre, ex: 'mongodb://localhost:27017/ma_base_de_donnees')
 mongoose
-  .connect(process.env.MONGODB_URI || "mongodb://localhost:27017/360conseil_db")
-  .then(() => console.log("Connecté à MongoDB"))
-  .catch((err) => console.error("Erreur de connexion à MongoDB:", err));
+  .connect(process.env.MONGO_URI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  })
+  .then(() => console.log("MongoDB Atlas connecté"))
+  .catch((err) => console.error("Erreur MongoDB :", err));
 
 // Middleware pour parser les requêtes JSON
 app.use(express.json());
