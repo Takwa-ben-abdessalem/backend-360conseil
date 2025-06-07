@@ -19,6 +19,14 @@ app.use(express.json());
 // Permet à votre frontend (sur un autre port) de communiquer avec ce backend
 app.use(cors());
 
+// Nouvelle route GET pour la racine (/)
+app.get("/", (req, res) => {
+  res
+    .status(200)
+    .send(
+      "Bienvenue sur l'API Backend de 360 conseil ! Le serveur est en ligne."
+    );
+});
 // Définir un schéma pour les demandes de devis
 const devisSchema = new mongoose.Schema({
   nom: String,
