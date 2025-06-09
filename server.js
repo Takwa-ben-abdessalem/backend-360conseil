@@ -5,6 +5,9 @@ const cors = require("cors"); // Importe le module cors
 const app = express();
 const PORT = process.env.PORT || 5000; // Le port sur lequel le serveur écoutera
 const mongoose = require("mongoose");
+const dotenv = require("dotenv");
+dotenv.config();
+require("dotenv").config();
 
 // Connexion à MongoDB (remplacez l'URL par la vôtre, ex: 'mongodb://localhost:27017/ma_base_de_donnees')
 mongoose
@@ -14,6 +17,7 @@ mongoose
   })
   .then(() => console.log("MongoDB Atlas connecté"))
   .catch((err) => console.error("Erreur MongoDB :", err));
+console.log("URI MongoDB :", process.env.MONGO_URI);
 
 // Middleware pour parser les requêtes JSON
 app.use(express.json());
