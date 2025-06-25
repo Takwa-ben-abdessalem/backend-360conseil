@@ -191,7 +191,7 @@ app.post("/api/contact", async (req, res) => {
 
     // Préparer et envoyer l’email
     const mailOptions = {
-      from: `"360 Conseil" <$${mail || "-"}>`,
+      from: `"360 Conseil" <$${email || "-"}>`,
       to: process.env.MAIL_RECEIVER || process.env.MAIL_USER,
       subject: "📩 Nouveau message de contact",
       html: `
@@ -199,7 +199,7 @@ app.post("/api/contact", async (req, res) => {
           <h2 style="color: #0066cc;">Nouveau message reçu via le formulaire de contact</h2>
           <p><strong>Nom :</strong> ${nom || "-"}</p>
           <p><strong>Prénom :</strong> ${prenom || "-"}</p>
-          <p><strong>Email :</strong> ${mail || "-"}</p>
+          <p><strong>Email :</strong> ${email || "-"}</p>
           <p><strong>Téléphone :</strong> ${telephone || "-"}</p>
           <p><strong>Ville :</strong> ${ville || "-"}</p>
           <p><strong>Code postal :</strong> ${codePostal || "-"}</p>
