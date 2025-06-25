@@ -63,12 +63,12 @@ const Devis = mongoose.model("Devis", devisSchema);
 
 // Configuration Nodemailer
 const transporter = nodemailer.createTransport({
-  host: process.env.MAIL_HOST, // ex: smtp.gmail.com
-  port: process.env.MAIL_PORT, // ex: 587
-  secure: false, // true si port 465, sinon false
+  host: process.env.MAIL_HOST,
+  port: Number(process.env.MAIL_PORT), // s'assurer que c'est bien un nombre
+  secure: false, // false pour port 587, true pour 465
   auth: {
-    user: process.env.MAIL_USER, // ton email
-    pass: process.env.MAIL_PASS, // ton mot de passe/app password
+    user: process.env.MAIL_USER,
+    pass: process.env.MAIL_PASS,
   },
 });
 
