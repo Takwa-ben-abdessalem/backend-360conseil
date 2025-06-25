@@ -18,21 +18,26 @@ mongoose
   .catch((err) => console.error("Erreur MongoDB :", err));
 
 console.log("URI MongoDB :", process.env.MONGO_URI);
+app.use(express.json());
 
-// Middleware
+const allowedOrigins = ["http://localhost:8080", "https://www.360conseil.fr"];
+
 app.use(
   cors({
     origin: function (origin, callback) {
-      if (!origin || allowedOrigins.includes(origin)) {
-        callback(null, true);
-      } else {
-        callback(new Error("Not allowed by CORS"));
+      // autoriser les requêtes sans origin (ex: curl, postman)
+      if (!origin) return callback(null, true);
+      if (allowedOrigins.indexOf(origin) === -1) {
+        const msg = `L'origine CORS ${origin} n'est pas autorisée.`;
+        return callback(new Error(msg), false);
       }
+      return callback(null, true);
     },
-    methods: ["GET", "POST", "PUT", "DELETE"],
+    methods: ["GET", "POST", "OPTIONS"],
     credentials: true,
   })
 );
+
 // Route racine
 app.get("/", (req, res) => {
   res
