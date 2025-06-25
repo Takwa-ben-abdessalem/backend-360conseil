@@ -115,6 +115,8 @@ app.post("/api/devis", async (req, res) => {
       from: `"360 Conseil" <${process.env.MAIL_USER}>`,
       to: process.env.MAIL_RECEIVER || process.env.MAIL_USER, // email qui reçoit la notif
       subject: "📩 Nouveau message de contact",
+      replyTo: mail, // user's email from the form
+
       html: `
       <div style="font-family: Arial, sans-serif; color: #333; padding: 20px; border: 1px solid #eee; border-radius: 8px; background-color: #f9f9f9;">
         <h2 style="color: #0066cc;">Nouveau message reçu via le formulaire de contact</h2>
@@ -194,6 +196,8 @@ app.post("/api/contact", async (req, res) => {
       from: `"360 Conseil" <${process.env.MAIL_USER}>`,
       to: process.env.MAIL_RECEIVER || process.env.MAIL_USER,
       subject: "📩 Nouveau message de contact",
+      replyTo: email, // user's email from the form
+
       html: `
         <div style="font-family: Arial, sans-serif; color: #333; padding: 20px; border: 1px solid #eee; border-radius: 8px; background-color: #f9f9f9;">
           <h2 style="color: #0066cc;">Nouveau message reçu via le formulaire de contact</h2>
