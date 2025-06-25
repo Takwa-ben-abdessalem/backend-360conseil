@@ -13,6 +13,7 @@ mongoose
   .connect(process.env.MONGO_URI, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
+    serverSelectionTimeoutMS: 30000, // 30s au lieu de 10s
   })
   .then(() => console.log("MongoDB Atlas connecté"))
   .catch((err) => console.error("Erreur MongoDB :", err));
@@ -77,6 +78,8 @@ const Devis = mongoose.model("Devis", devisSchema);
 
 // Configuration Nodemailer
 const transporter = nodemailer.createTransport({
+  service: "gmail",
+
   host: process.env.MAIL_HOST,
   port: Number(process.env.MAIL_PORT), // s'assurer que c'est bien un nombre
   secure: false, // false pour port 587, true pour 465
@@ -111,16 +114,21 @@ app.post("/api/devis", async (req, res) => {
     const mailOptions = {
       from: `"360 Conseil" <${process.env.MAIL_USER}>`,
       to: process.env.MAIL_RECEIVER || process.env.MAIL_USER, // email qui reçoit la notif
-      subject: "Nouvelle demande de devis",
-      text: `Vous avez reçu une nouvelle demande de devis :
-Nom: ${nom}
-Prénom: ${prenom}
-Téléphone: ${telephone}
-Email: ${mail}
-Ville: ${ville}
-Code Postal: ${codePostal}
-Type de Projet: ${typeProjet}
-      `,
+      subject: "📩 Nouveau message de contact",
+      html: `
+      <div style="font-family: Arial, sans-serif; color: #333; padding: 20px; border: 1px solid #eee; border-radius: 8px; background-color: #f9f9f9;">
+        <h2 style="color: #0066cc;">Nouveau message reçu via le formulaire de contact</h2>
+        <p><strong>Nom :</strong> ${nom || "-"}</p>
+        <p><strong>Prénom :</strong> ${prenom || "-"}</p>
+        <p><strong>Email :</strong> ${mail || "-"}</p>
+        <p><strong>Téléphone :</strong> ${telephone || "-"}</p>
+        <p><strong>Ville :</strong> ${ville || "-"}</p>
+        <p><strong>Code postal :</strong> ${codePostal || "-"}</p>
+        <p><strong>Type de projet :</strong> ${typeProjet || "-"}</p>
+        <hr style="margin-top: 20px;" />
+        <p style="font-size: 0.9em; color: #888;">Ce message a été envoyé automatiquement depuis le site 360Conseil.</p>
+      </div>
+    `,
     };
 
     // Envoyer l'email
@@ -130,6 +138,7 @@ Type de Projet: ${typeProjet}
         // Tu peux décider d'envoyer quand même la réponse 200 ou 500 selon ton choix
       } else {
         console.log("Email envoyé :", info.response);
+        console.log("✉️ Tentative d'envoi :", mailOptions);
       }
     });
 
@@ -184,15 +193,21 @@ app.post("/api/contact", async (req, res) => {
     const mailOptions = {
       from: `"360 Conseil" <${process.env.MAIL_USER}>`,
       to: process.env.MAIL_RECEIVER || process.env.MAIL_USER,
-      subject: "Nouveau message de contact",
-      text: `Vous avez reçu un nouveau message de contact :
-Nom et Prénom: ${nomPrenom}
-Téléphone: ${telephone}
-Email: ${email}
-Ville: ${ville}
-Code Postal: ${codePostal}
-Type de Projet: ${typeProjet}
-Recevoir des mises à jour: ${receiveUpdates}`,
+      subject: "📩 Nouveau message de contact",
+      html: `
+        <div style="font-family: Arial, sans-serif; color: #333; padding: 20px; border: 1px solid #eee; border-radius: 8px; background-color: #f9f9f9;">
+          <h2 style="color: #0066cc;">Nouveau message reçu via le formulaire de contact</h2>
+          <p><strong>Nom :</strong> ${nom || "-"}</p>
+          <p><strong>Prénom :</strong> ${prenom || "-"}</p>
+          <p><strong>Email :</strong> ${mail || "-"}</p>
+          <p><strong>Téléphone :</strong> ${telephone || "-"}</p>
+          <p><strong>Ville :</strong> ${ville || "-"}</p>
+          <p><strong>Code postal :</strong> ${codePostal || "-"}</p>
+          <p><strong>Type de projet :</strong> ${typeProjet || "-"}</p>
+          <hr style="margin-top: 20px;" />
+          <p style="font-size: 0.9em; color: #888;">Ce message a été envoyé automatiquement depuis le site 360Conseil.</p>
+        </div>
+      `,
     };
 
     transporter.sendMail(mailOptions, (error, info) => {
