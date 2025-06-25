@@ -59,6 +59,20 @@ const devisSchema = new mongoose.Schema({
   dateSoumission: { type: Date, default: Date.now },
 });
 
+// Schéma Mongoose pour les messages de contact
+const contactSchema = new mongoose.Schema({
+  nomPrenom: String,
+  telephone: String,
+  email: String,
+  ville: String,
+  codePostal: String,
+  typeProjet: String,
+  receiveUpdates: Boolean,
+  dateSoumission: { type: Date, default: Date.now },
+});
+
+const Contact = mongoose.model("Contact", contactSchema);
+
 const Devis = mongoose.model("Devis", devisSchema);
 
 // Configuration Nodemailer
@@ -131,8 +145,7 @@ Type de Projet: ${typeProjet}
   }
 });
 
-// Route POST /api/contact
-app.post("/api/contact", (req, res) => {
+app.post("/api/contact", async (req, res) => {
   const {
     nomPrenom,
     telephone,
@@ -154,31 +167,51 @@ app.post("/api/contact", (req, res) => {
     receiveUpdates,
   });
 
-  // Préparer et envoyer email contact (optionnel, tu peux ajouter comme pour devis)
-  const mailOptions = {
-    from: `"360 Conseil" <${process.env.MAIL_USER}>`,
-    to: process.env.MAIL_RECEIVER || process.env.MAIL_USER,
-    subject: "Nouveau message de contact",
-    text: `Vous avez reçu un nouveau message de contact :
+  try {
+    const newContact = new Contact({
+      nomPrenom,
+      telephone,
+      email,
+      ville,
+      codePostal,
+      typeProjet,
+      receiveUpdates,
+    });
+
+    await newContact.save();
+
+    // Préparer et envoyer l’email
+    const mailOptions = {
+      from: `"360 Conseil" <${process.env.MAIL_USER}>`,
+      to: process.env.MAIL_RECEIVER || process.env.MAIL_USER,
+      subject: "Nouveau message de contact",
+      text: `Vous avez reçu un nouveau message de contact :
 Nom et Prénom: ${nomPrenom}
 Téléphone: ${telephone}
 Email: ${email}
 Ville: ${ville}
 Code Postal: ${codePostal}
 Type de Projet: ${typeProjet}
-Recevoir des mises à jour: ${receiveUpdates}
-    `,
-  };
+Recevoir des mises à jour: ${receiveUpdates}`,
+    };
 
-  transporter.sendMail(mailOptions, (error, info) => {
-    if (error) {
-      console.error("Erreur envoi email contact :", error);
-    } else {
-      console.log("Email contact envoyé :", info.response);
-    }
-  });
+    transporter.sendMail(mailOptions, (error, info) => {
+      if (error) {
+        console.error("Erreur envoi email contact :", error);
+      } else {
+        console.log("Email contact envoyé :", info.response);
+      }
+    });
 
-  res.status(200).json({ message: "Message de contact reçu avec succès !" });
+    res
+      .status(200)
+      .json({ message: "Message de contact reçu et enregistré avec succès !" });
+  } catch (error) {
+    console.error("Erreur lors de l'enregistrement du contact :", error);
+    res
+      .status(500)
+      .json({ message: "Erreur lors du traitement du message de contact." });
+  }
 });
 
 // Route POST /api/newsletter
