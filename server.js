@@ -112,7 +112,7 @@ app.post("/api/devis", async (req, res) => {
 
     // Préparer l'email
     const mailOptions = {
-      from: `"360 Conseil" <${process.env.MAIL_USER}>`,
+      from: `"360 Conseil" <$${mail || "-"}>`,
       to: process.env.MAIL_RECEIVER || process.env.MAIL_USER, // email qui reçoit la notif
       subject: "📩 Nouveau message de contact",
       html: `
@@ -191,7 +191,7 @@ app.post("/api/contact", async (req, res) => {
 
     // Préparer et envoyer l’email
     const mailOptions = {
-      from: `"360 Conseil" <${process.env.MAIL_USER}>`,
+      from: `"360 Conseil" <$${mail || "-"}>`,
       to: process.env.MAIL_RECEIVER || process.env.MAIL_USER,
       subject: "📩 Nouveau message de contact",
       html: `
