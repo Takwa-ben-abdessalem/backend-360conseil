@@ -72,8 +72,16 @@ const contactSchema = new mongoose.Schema({
   dateSoumission: { type: Date, default: Date.now },
 });
 
-const Contact = mongoose.model("Contact", contactSchema);
+const contactSimpleSchema = new mongoose.Schema({
+  nomComplet: String,
+  email: String,
+  sujet: String,
+  message: String,
+  dateSoumission: { type: Date, default: Date.now },
+});
 
+const Contact = mongoose.model("Contact", contactSchema);
+const ContactSimple = mongoose.model("ContactSimple", contactSimpleSchema);
 const Devis = mongoose.model("Devis", devisSchema);
 
 // Configuration Nodemailer
@@ -225,6 +233,63 @@ app.post("/api/contact", async (req, res) => {
     res
       .status(200)
       .json({ message: "Message de contact reçu et enregistré avec succès !" });
+  } catch (error) {
+    console.error("Erreur lors de l'enregistrement du contact :", error);
+    res
+      .status(500)
+      .json({ message: "Erreur lors du traitement du message de contact." });
+  }
+});
+
+app.post("/api/contact-simple", async (req, res) => {
+  const { nomComplet, email, sujet, message } = req.body;
+
+  console.log("Nouveau message contact reçu :");
+  console.log({ nomComplet, email, sujet, message });
+
+  try {
+    // Sauvegarde dans MongoDB
+    const newContact = new ContactSimple({
+      nomComplet,
+      email,
+      sujet,
+      message,
+    });
+    await newContact.save();
+
+    // Préparer l'email
+    const mailOptions = {
+      from: `"360 Conseil" <${process.env.MAIL_USER}>`,
+      to: process.env.MAIL_RECEIVER || process.env.MAIL_USER,
+      subject: "📩 Nouveau message de contact",
+      replyTo: email, // user's email from the form
+
+      html: `
+        <div style="font-family: Arial, sans-serif; color: #333; padding: 20px; border: 1px solid #eee; border-radius: 8px; background-color: #f9f9f9;">
+          <h2 style="color: #0066cc;">Nouveau message reçu via le formulaire de contact</h2>
+          <p><strong>Nom complet :</strong> ${nomComplet || "-"}</p>
+          <p><strong>Email :</strong> ${email || "-"}</p>
+          <p><strong>Sujet :</strong> ${sujet || "-"}</p>
+          <p><strong>Message :</strong> ${message || "-"}</p>
+          <hr style="margin-top: 20px;" />
+          <p style="font-size: 0.9em; color: #888;">Ce message a été envoyé automatiquement depuis le site 360Conseil.</p>
+        </div>
+      `,
+    };
+    // Envoyer l'email
+    transporter.sendMail(mailOptions, (error, info) => {
+      if (error) {
+        console.error("Erreur envoi email contact :", error);
+      } else {
+        console.log("Email contact envoyé :", info.response);
+      }
+    });
+
+    res
+      .status(200)
+      .json({
+        message: "Message de contact reçu et email envoyé avec succès !",
+      });
   } catch (error) {
     console.error("Erreur lors de l'enregistrement du contact :", error);
     res
