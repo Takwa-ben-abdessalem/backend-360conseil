@@ -209,8 +209,7 @@ app.post("/api/contact", async (req, res) => {
       html: `
         <div style="font-family: Arial, sans-serif; color: #333; padding: 20px; border: 1px solid #eee; border-radius: 8px; background-color: #f9f9f9;">
           <h2 style="color: #0066cc;">Nouveau message reçu via le formulaire de contact</h2>
-          <p><strong>Nom :</strong> ${nom || "-"}</p>
-          <p><strong>Prénom :</strong> ${prenom || "-"}</p>
+          <p><strong>Nom et Prénom :</strong> ${nomPrenom || "-"}</p>
           <p><strong>Email :</strong> ${email || "-"}</p>
           <p><strong>Téléphone :</strong> ${telephone || "-"}</p>
           <p><strong>Ville :</strong> ${ville || "-"}</p>
@@ -285,11 +284,9 @@ app.post("/api/contact-simple", async (req, res) => {
       }
     });
 
-    res
-      .status(200)
-      .json({
-        message: "Message de contact reçu et email envoyé avec succès !",
-      });
+    res.status(200).json({
+      message: "Message de contact reçu et email envoyé avec succès !",
+    });
   } catch (error) {
     console.error("Erreur lors de l'enregistrement du contact :", error);
     res
